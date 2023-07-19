@@ -1,25 +1,43 @@
 import os
-import openai
+import requests
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
 from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
-openai.api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("OPENAI_API_KEY")
 
 
-@app.route("/", methods=("GET", "POST"))
+
+
+@app.route("/")
 def index():
-    if request.method == "POST":
-        animal = request.form["animal"]
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=generate_prompt(animal),
-            temperature=0.1,
-        )
-        return redirect(url_for("index", result=response.choices[0].text))
-
-    result = request.args.get("result")
-    return render_template("index.html", result=result)
+    return render_template("index.html")
 
 
-def generate_prompt(animal):
-    pass
+
+@app.route("/results", methods=["POST"])
+def answer():
+    topic = request.form["topic"]
+    prompt = request.form["prompt"]
+    model = 'gpt-3.5-turbo'
+    completions = requests.post(
+    'https://api.openai.com/v1/completions',
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}'
+    },
+    json = {
+        'model': model,
+        'prompt': 'what is your name',
+        'temperature': 0.4,
+        'max_tokens': 300
+    })
+    print(completions)
+    return render_template("results.html", response=completions.json()) 
+
+
+
+ 
+
