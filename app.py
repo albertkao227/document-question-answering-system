@@ -1,4 +1,7 @@
+#!/usr/bin/python3
+
 import os
+import openai
 import requests
 from sentence_transformers import SentenceTransformer
 model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -6,8 +9,8 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
-api_key = os.getenv("OPENAI_API_KEY")
-
+#api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
 
@@ -17,27 +20,32 @@ def index():
 
 
 
-@app.route("/results", methods=["POST"])
+@app.route("/answer", methods=["POST"])
 def answer():
-    topic = request.form["topic"]
-    prompt = request.form["prompt"]
+    question = request.form["question"]
+    category = request.form["category"]
+    
+    prompt = f'''
+    Please answer following question in details:
+    {question}
+
+    Answer: 
+    '''
+
     model = 'gpt-3.5-turbo'
-    completions = requests.post(
-    'https://api.openai.com/v1/completions',
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {api_key}'
-    },
-    json = {
-        'model': model,
-        'prompt': 'what is your name',
-        'temperature': 0.4,
-        'max_tokens': 300
-    })
-    print(completions)
-    return render_template("results.html", response=completions.json()) 
+
+    response = openai.Completion.create(
+        engine="text-davinci-002", prompt=f"Q: {prompt}\nA:", 
+        max_tokens=1024, n=1, stop=None, temperature=0.7,
+    )
+    answer = response.choices[0].text.strip()
+    
+    # Return answer as JSON
+    #return jsonify({"answer": answer})
+    print(answer)
+    return render_template("answer.html", response=answer) 
 
 
-
- 
+# if __name__ == "__main__":
+#     app.run() 
 
