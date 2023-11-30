@@ -1,17 +1,19 @@
 #!/usr/bin/python3
 
 import os
+import json
 import numpy as np
 import openai
 import pickle
 import requests
-from sentence_transformers import SentenceTransformer
-model = SentenceTransformer('all-MiniLM-L6-v2')
-
+#from sentence_transformers import SentenceTransformer
+from openai import OpenAI
 from flask import Flask, redirect, render_template, request, url_for
+#model = SentenceTransformer('all-MiniLM-L6-v2')
+
 
 app = Flask(__name__)
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+api_key = os.environ.get("OPENAI_API_KEY")
 
 
 def read_pickle(filename):
@@ -38,43 +40,66 @@ def answer():
     question = request.form["question"]
     category = request.form["category"]
     
-    page_vectors = read_pickle('vectors.pkl') 
-    page_text = read_pickle('manual.pkl') 
+    if category == 'Summarize':
+        prompt = f'''
+        Please summarize below paragraph into three sentences:
+        {question}                                                                                                           
+        Answer: 
+        '''
+    else:
+        prompt = f'''
+        Please answer following question in details:
+        {question}                                                                                                           
+        Answer: 
+        '''
+
+    # page_vectors = read_pickle('vectors.pkl') 
+    # page_text = read_pickle('manual.pkl') 
     
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-    question_vec = model.encode([question])[0]
+    # model = SentenceTransformer('all-MiniLM-L6-v2')
+    # question_vec = model.encode([question])[0]
      
-    top3 = get_top3(question_vec, page_vectors, 3)
-    print(top3)
-    print(page_text[top3[0]])   
-    print(page_text[top3[1]])  
-    print(page_text[top3[2]])  
+    # top3 = get_top3(question_vec, page_vectors, 3)
+    # print(top3)
+    # print(page_text[top3[0]])   
+    # print(page_text[top3[1]])  
+    # print(page_text[top3[2]])  
 
 
-    prompt = f'''
-    Please answer following question in details:
-    {question}
-
-    Answer: 
-    '''
-
-    model = 'gpt-3.5-turbo'
-
-    response = openai.Completion.create(
-        engine="text-davinci-002", prompt=f"Q: {prompt}\nA:", 
-        max_tokens=1024, n=1, stop=None, temperature=0.7,
+    client = OpenAI(
+        # defaults to os.environ.get("OPENAI_API_KEY")
+        api_key=f"{api_key}",
     )
-    answer = response.choices[0].text.strip()
+
+    completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": f"{prompt}\n",
+            }
+        ],
+        model="gpt-3.5-turbo",
+    )
+
+    response = json.loads(completion.model_dump_json())
+    answer = response['choices'][0]['message']['content']
+
+    # response = openai.Completion.create(
+    #     engine="text-davinci-002", prompt=f"Q: {prompt}\nA:", 
+    #     max_tokens=1024, n=1, stop=None, temperature=0.7,
+    # )
+    # answer = response.choices[0].text.strip()
     
-    # Return answer as JSON
-    #return jsonify({"answer": answer})
-    print(answer)
-    return render_template("answer.html", response=answer) 
+    output = f'''
+    {category}:  
+
+    {answer}'
+    '''
+    return render_template("answer.html", response=output) 
 
 
 # if __name__ == "__main__":
 #     app.run() 
-
 
 # Given the following extracted parts of a long document and a question, create a final answer with references ("SOURCES").
 # If you don't know the answer, just say that you don't know. Don't try to make up an answer.
