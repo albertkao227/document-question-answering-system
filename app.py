@@ -48,12 +48,19 @@ def answer():
     print(page_text[top3[2]])  
     document = page_text[top3[0]]
 
-    if category == 'Summarize':
+    if category=='Summarize':
         prompt = f'''
         Please summarize below paragraph into three sentences:
         {question}                                                                                                           
         Answer: 
         '''
+    elif category=='Question Answering':
+        prompt = f'''
+        Please answer below question to the best of your ability and provide reference. 
+        QUESTION: {question}        
+        =========                                                                                                   
+        ANSWER: 
+        '''        
     else:
         # prompt = f'''
         # Please answer following question in details:
