@@ -10,8 +10,6 @@ from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 from flask import Flask, redirect, render_template, request, url_for
 model = SentenceTransformer('all-MiniLM-L6-v2')
-
-
 app = Flask(__name__)
 api_key = os.environ.get("OPENAI_API_KEY")
 
@@ -39,23 +37,16 @@ def index():
 def answer():
     question = request.form["question"]
     category = request.form["category"]
-    
-
-
     page_vectors = read_pickle('vectors1.pkl') 
     page_text = read_pickle('manual.pkl') 
-    
-    #model = SentenceTransformer('all-MiniLM-L6-v2')
-    question_vec = model.encode([question])[0]
-     
+
+    question_vec = model.encode([question])[0]     
     top3 = get_top3(question_vec, page_vectors, 3)
     print(top3)
     print(page_text[top3[0]])   
     print(page_text[top3[1]])  
     print(page_text[top3[2]])  
-
     document = page_text[top3[0]]
-
 
     if category == 'Summarize':
         prompt = f'''
@@ -85,13 +76,9 @@ def answer():
         SOURCES:
         '''
 
-
-
     client = OpenAI(
-        # defaults to os.environ.get("OPENAI_API_KEY")
         api_key=f"{api_key}",
     )
-
     completion = client.chat.completions.create(
         messages=[
             {
@@ -99,39 +86,15 @@ def answer():
                 "content": f"{prompt}\n",
             }
         ],
-        model="gpt-3.5-turbo",
+        #model="gpt-3.5-turbo",
+        model='gpt-4',
     )
 
     response = json.loads(completion.model_dump_json())
     answer = response['choices'][0]['message']['content']
-
-    # response = openai.Completion.create(
-    #     engine="text-davinci-002", prompt=f"Q: {prompt}\nA:", 
-    #     max_tokens=1024, n=1, stop=None, temperature=0.7,
-    # )
-    # answer = response.choices[0].text.strip()
-    
-    output = f'''
-    {category}: \\n 
-    page: {top3[0]} \\n  
-
-    {answer}'
-    '''
+    output = f'{category}: \\n page: {top3[0]} \\n {answer}'
     return render_template("answer.html", response=output) 
 
 
 # if __name__ == "__main__":
 #     app.run() 
-
-# Given the following extracted parts of a long document and a question, create a final answer with references ("SOURCES").
-# If you don't know the answer, just say that you don't know. Don't try to make up an answer.
-# ALWAYS return a "SOURCES" part in your answer.
-
-# QUESTION: {question}
-# =========
-# Content: ...
-# Source: ...
-# ...
-# =========
-# FINAL ANSWER:
-# SOURCES:
