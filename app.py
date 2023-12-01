@@ -6,10 +6,10 @@ import numpy as np
 import openai
 import pickle
 import requests
-#from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 from flask import Flask, redirect, render_template, request, url_for
-#model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
 app = Flask(__name__)
@@ -40,6 +40,23 @@ def answer():
     question = request.form["question"]
     category = request.form["category"]
     
+
+
+    page_vectors = read_pickle('vectors1.pkl') 
+    page_text = read_pickle('manual.pkl') 
+    
+    #model = SentenceTransformer('all-MiniLM-L6-v2')
+    question_vec = model.encode([question])[0]
+     
+    top3 = get_top3(question_vec, page_vectors, 3)
+    print(top3)
+    print(page_text[top3[0]])   
+    print(page_text[top3[1]])  
+    print(page_text[top3[2]])  
+
+    document = page_text[top3[0]]
+
+
     if category == 'Summarize':
         prompt = f'''
         Please summarize below paragraph into three sentences:
@@ -47,23 +64,27 @@ def answer():
         Answer: 
         '''
     else:
+        # prompt = f'''
+        # Please answer following question in details:
+        # {question}                                                                                                           
+        # Answer: 
+        # '''
+
         prompt = f'''
-        Please answer following question in details:
-        {question}                                                                                                           
-        Answer: 
+        Please respond as if you were talking to a non-expert. Use analogies. 
+        Given the following extracted parts of a operating manual of a space shuttle and a question, 
+        create a final answer with references from the provided document.
+        If you don't know the answer, just say that you don't know. 
+        Don't try to make up an answer.
+        ALWAYS return a "SOURCES" part in your answer.
+        DOCUMENT: {document}
+        QUESTION: {question}
+        ...
+        =========
+        FINAL ANSWER:
+        SOURCES:
         '''
 
-    # page_vectors = read_pickle('vectors.pkl') 
-    # page_text = read_pickle('manual.pkl') 
-    
-    # model = SentenceTransformer('all-MiniLM-L6-v2')
-    # question_vec = model.encode([question])[0]
-     
-    # top3 = get_top3(question_vec, page_vectors, 3)
-    # print(top3)
-    # print(page_text[top3[0]])   
-    # print(page_text[top3[1]])  
-    # print(page_text[top3[2]])  
 
 
     client = OpenAI(
@@ -91,7 +112,8 @@ def answer():
     # answer = response.choices[0].text.strip()
     
     output = f'''
-    {category}:  
+    {category}: \\n 
+    page: {top3[0]} \\n  
 
     {answer}'
     '''
