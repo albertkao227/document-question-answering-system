@@ -6,6 +6,7 @@ import numpy as np
 import openai
 import pickle
 import requests
+from prompts import * 
 from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 from flask import Flask, redirect, render_template, request, url_for
