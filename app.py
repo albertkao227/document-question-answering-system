@@ -38,8 +38,8 @@ def index():
 def answer():
     question = request.form["question"]
     category = request.form["category"]
-    page_vectors = read_pickle('vectors1.pkl') 
-    page_text = read_pickle('manual.pkl') 
+    page_vectors = read_pickle('vectors.pkl') 
+    page_text = read_pickle('document.pkl') 
 
     question_vec = model.encode([question])[0]     
     top3 = get_top3(question_vec, page_vectors, 3)
