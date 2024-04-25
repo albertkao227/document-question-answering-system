@@ -95,12 +95,15 @@ def answer():
             }
         ],
         #model="gpt-3.5-turbo",
-        model='gpt-4',
+        model='gpt-4-turbo',
     )
 
     response = json.loads(completion.model_dump_json())
     answer = response['choices'][0]['message']['content']
-    output = f'{category}: \\n page: {top3[0]} \\n {answer}'
+    if category == 'Answer Questions about Document':
+        output = f'{category}: | Page: {top3[0]} | Answer: {answer}'
+    else:
+        output = f'{category}: | Answer: {answer}'
     return render_template("answer.html", response=output) 
 
 
