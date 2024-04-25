@@ -11,16 +11,20 @@ Download python libraries:
 pip install -r requirements.txt
 ```
 
-To vectorize documents for the question-answering system using [sentence transformers](https://sbert.net/) with example instructions [here](https://sbert.net/#usage).
+### Preprocess Documents for Similarity Search 
 
-Convert each section or each page of the target document into one single vector and save. 
+To vectorize documents for the question-answering system, use library [sentence transformers](https://sbert.net/) with example instructions [here](https://sbert.net/#usage). Convert each section of the document into a single vector, and save to `vectors.pkl`. The original document should be saved as `document.pkl`. 
 
-To run the app, move to top directory and type: 
+
+### Run App 
+
+To run the app: 
 
 ```
 flask run
 ```
-we can see an application opening up in your browser!
+
+QA Application should open up in browser: 
 
 ![User Interface](assets/example.png)
 
