@@ -2,7 +2,7 @@
 
 ## Utilize large language models to develop QA system for provided documents.
 
-This repository utlizes LLM, or OpenAI ChatGPT API https://platform.openai.com/docs/guides/text-generation/json-mode to create an app for question-answering for the contents in documents.     
+This repository utlizes LLM, or [OpenAI ChatGPT API](https://platform.openai.com/docs/guides/text-generation/json-mode) to create an app for question-answering for the contents in documents.     
 
 
 Download python libraries:
