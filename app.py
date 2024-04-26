@@ -2,14 +2,11 @@
 
 import os
 import json
-import numpy as np
-import openai
-import pickle
-import requests
+import pickle  
 from prompts import * 
 from sentence_transformers import SentenceTransformer
 from openai import OpenAI
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, render_template, request
 model = SentenceTransformer('all-MiniLM-L6-v2')
 app = Flask(__name__)
 api_key = os.environ.get("OPENAI_API_KEY")
@@ -63,12 +60,6 @@ def answer():
         ANSWER: 
         '''        
     else:
-        # prompt = f'''
-        # Please answer following question in details:
-        # {question}                                                                                                           
-        # Answer: 
-        # '''
-
         prompt = f'''
         Please respond as if you were talking to a non-expert. Use analogies. 
         Given the following extracted parts of a operating manual of a space shuttle and a question, 
@@ -94,7 +85,6 @@ def answer():
                 "content": f"{prompt}\n",
             }
         ],
-        #model="gpt-3.5-turbo",
         model='gpt-4-turbo',
     )
 
