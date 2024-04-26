@@ -40,18 +40,16 @@ To run the app:
 flask run
 ```
 
-### Run App with Local LLM
-
-The `local_llm_app.py` script works for (**Mistral-7B-Instruct-v0.1-GGUF**)[https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.1-GGUF]. Download gguf model and set environment variable `MODEL_PATH`. 
-
-```
-flask run local_llm_app
-```
-
 Question-Answering Application should open up in browser `http://127.0.0.1:5000`: 
 
 ![User Interface](assets/example.png)
 
+### Run App with Local LLM
 
+The `local_llm_app.py` script works for [**Mistral-7B-Instruct-v0.1-GGUF**](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.1-GGUF). Download gguf model and set environment variable `MODEL_PATH`. 
+
+```
+flask run local_llm_app
+```
 
 
