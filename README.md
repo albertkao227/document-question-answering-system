@@ -29,7 +29,7 @@ sections = [
 ]
 
 # Sentences are encoded by calling model.encode()
-embeddings = model.encode(sentences)
+embeddings = model.encode(sections)
 ```
 
 ## Run App with OpenAI API
