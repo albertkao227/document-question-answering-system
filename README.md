@@ -42,7 +42,7 @@ flask run
 
 Question-Answering Application should open up in browser `http://127.0.0.1:5000`: 
 
-![User Interface](assets/example.png)
+![User Interface](images/example.png)
 
 ## Run App with Local LLM 
 
